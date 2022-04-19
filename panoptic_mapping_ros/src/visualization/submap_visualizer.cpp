@@ -8,6 +8,7 @@
 #include <minkindr_conversions/kindr_msg.h>
 #include <ros/time.h>
 #include <voxblox_ros/ptcloud_vis.h>
+#include <voxblox/mesh/mesh.h>
 
 namespace panoptic_mapping {
 
@@ -165,6 +166,7 @@ std::vector<voxblox_msgs::MultiMesh> SubmapVisualizer::generateMeshMsgs(
   }
 
   // Process all submaps based on their visualization info.
+  // size_t map_coverage = 0;
   for (Submap& submap : *submaps) {
     if (submap.getLabel() == PanopticLabel::kFreeSpace) {
       continue;
@@ -187,6 +189,12 @@ std::vector<voxblox_msgs::MultiMesh> SubmapVisualizer::generateMeshMsgs(
 
     // Update the mesh.
     submap.updateMesh();
+
+    // map coverage
+    // voxblox::Mesh full_map = voxblox::Mesh();
+    // submap.getMeshLayer().getMesh(&full_map);
+    // map_coverage += full_map.vertices.size();
+    // LOG_IF(INFO, true) << map_coverage;
 
     // Mark the whole mesh for re-publishing if requested.
     if (info.republish_everything) {

@@ -86,6 +86,7 @@ class PanopticMapper {
 
   // ROS callbacks.
   // Timers.
+  void publishRewardCallback(const ros::TimerEvent&);
   void publishVisualizationCallback(const ros::TimerEvent&);
   void dataLoggingCallback(const ros::TimerEvent&);
   void printTimingsCallback(const ros::TimerEvent&);
@@ -126,6 +127,7 @@ class PanopticMapper {
 
   // Update the meshes and publish the all visualizations of the current map.
   void publishVisualization();
+  void publishReward();
 
   // Access.
   const SubmapCollection& getSubmapCollection() const { return *submaps_; }
@@ -160,6 +162,7 @@ class PanopticMapper {
   ros::Timer data_logging_timer_;
   ros::Timer print_timing_timer_;
   ros::Timer input_timer_;
+  ros::Publisher reward_pub;
 
   // Members.
   const Config config_;
@@ -167,6 +170,8 @@ class PanopticMapper {
   // Map.
   std::shared_ptr<SubmapCollection> submaps_;
   std::shared_ptr<ThreadSafeSubmapCollection> thread_safe_submaps_;
+  double map_size_prev;
+  int num_submap_prev;
 
   // Mapping.
   std::unique_ptr<IDTrackerBase> id_tracker_;

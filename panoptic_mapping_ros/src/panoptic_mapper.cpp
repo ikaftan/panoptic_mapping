@@ -1,4 +1,6 @@
 #include "panoptic_mapping_ros/panoptic_mapper.h"
+#include "panoptic_mapping/map/submap.h"
+#include "panoptic_mapping/map/submap_collection.h"
 
 #include <map>
 #include <memory>
@@ -6,6 +8,10 @@
 #include <string>
 #include <utility>
 #include <vector>
+
+#include <std_msgs/Int8.h>
+#include <voxblox/mesh/mesh.h>
+#include <voxblox/mesh/mesh_layer.h>
 
 #include <panoptic_mapping/common/camera.h>
 #include <panoptic_mapping/labels/label_handler_base.h>
@@ -79,6 +85,8 @@ PanopticMapper::PanopticMapper(const ros::NodeHandle& nh,
 void PanopticMapper::setupMembers() {
   // Map.
   submaps_ = std::make_shared<SubmapCollection>();
+  map_size_prev = 0;
+  num_submap_prev = 0;
 
   // Threadsafe wrapper for the map.
   thread_safe_submaps_ = std::make_shared<ThreadSafeSubmapCollection>(submaps_);
@@ -180,6 +188,9 @@ void PanopticMapper::setupCollectionDependentMembers() {
 void PanopticMapper::setupRos() {
   // Setup all input topics.
   input_synchronizer_->advertiseInputTopics();
+
+  // Reward publisher
+  reward_pub = nh_private_.advertise<std_msgs::Int8>("reward", 100);
 
   // Services.
   save_map_srv_ = nh_private_.advertiseService(
@@ -283,6 +294,7 @@ void PanopticMapper::processInput(InputData* input) {
   if (config_.visualization_interval < 0.f) {
     Timer vis_timer("input/visualization");
     publishVisualizationCallback(ros::TimerEvent());
+    publishRewardCallback(ros::TimerEvent());
   }
   if (config_.data_logging_interval < 0.f) {
     dataLoggingCallback(ros::TimerEvent());
@@ -325,6 +337,26 @@ void PanopticMapper::publishVisualization() {
   Timer timer("visualization");
   submap_visualizer_->visualizeAll(submaps_.get());
   planning_visualizer_->visualizeAll();
+}
+
+void PanopticMapper::publishReward() {
+  SubmapCollection* submaps = submaps_.get();
+  // double map_size = 0;
+  int num_submap = submaps->size();
+  // voxblox::Mesh mesh = voxblox::Mesh();
+  // for (Submap& submap : *submaps) {
+  //   submap.getMeshLayer().getMesh(&mesh);
+  //   map_size += mesh.vertices.size();
+  // }
+  // double map_size_diff = map_size - map_size_prev;
+  // map_size_prev = map_size;
+  // LOG_IF(INFO, true) << map_size_diff;
+  int num_submap_diff = num_submap - num_submap_prev;
+  num_submap_prev = num_submap;
+  std_msgs::Int8 reward_msg;
+  reward_msg.data = num_submap_diff;
+  reward_pub.publish(reward_msg);
+  LOG_IF(INFO, true) << num_submap_diff;
 }
 
 bool PanopticMapper::saveMap(const std::string& file_path) {
@@ -374,6 +406,10 @@ void PanopticMapper::dataLoggingCallback(const ros::TimerEvent&) {
 
 void PanopticMapper::publishVisualizationCallback(const ros::TimerEvent&) {
   publishVisualization();
+}
+
+void PanopticMapper::publishRewardCallback(const ros::TimerEvent&) {
+  publishReward();
 }
 
 bool PanopticMapper::setVisualizationModeCallback(
