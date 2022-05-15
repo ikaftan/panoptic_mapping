@@ -12,7 +12,7 @@ ros_spinning_threads: 8
 
 labels:
   type: csv
-  file_name: /home/asl/plr/kb_agent_dataset/groundtruth_labels_debug.csv
+  file_name: /home/asl/plr/kb_agent_dataset/groundtruth_labels_7.csv
 
 camera:
   verbosity: 1
@@ -60,7 +60,7 @@ id_tracker:
   depth_tolerance: -1  # m, negative = #vs
   tracking_metric: IoU  # IoU, overlap
   match_acceptance_threshold: 0.1  
-  min_allocation_size: 30 # px, for submap allocation.
+  min_allocation_size: 2000 # px, for submap allocation.
   use_class_data_for_matching: true  
 
 tsdf_integrator:  
@@ -116,7 +116,7 @@ visualization:
     type: submaps  # submaps, single_tsdf
     verbosity: 1
     color_mode: color # submaps, instances, color, normals, classes, change, classification
-    visualization_mode: all  # all, active, active_only, inactive, persistent
+    visualization_mode: active # all, active, active_only, inactive, persistent
     submap_color_discretization: 20
     visualize_mesh: true
     visualize_tsdf_blocks: true

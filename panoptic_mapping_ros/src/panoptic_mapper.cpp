@@ -8,16 +8,23 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <cmath>
 
+#include <std_msgs/Float64.h>
 #include <std_msgs/Int8.h>
 #include <voxblox/mesh/mesh.h>
 #include <voxblox/mesh/mesh_layer.h>
+#include <voxblox/core/block.h>
+#include <voxblox/core/voxel.h>
 
 #include <panoptic_mapping/common/camera.h>
+#include <panoptic_mapping/common/common.h>
+#include <panoptic_mapping/map/submap.h>
 #include <panoptic_mapping/labels/label_handler_base.h>
 #include <panoptic_mapping/map/classification/fixed_count.h>
 #include <panoptic_mapping/submap_allocation/freespace_allocator_base.h>
 #include <panoptic_mapping/submap_allocation/submap_allocator_base.h>
+
 
 namespace panoptic_mapping {
 
@@ -87,6 +94,7 @@ void PanopticMapper::setupMembers() {
   submaps_ = std::make_shared<SubmapCollection>();
   map_size_prev = 0;
   num_submap_prev = 0;
+  episode_idx = 0;
 
   // Threadsafe wrapper for the map.
   thread_safe_submaps_ = std::make_shared<ThreadSafeSubmapCollection>(submaps_);
@@ -190,7 +198,8 @@ void PanopticMapper::setupRos() {
   input_synchronizer_->advertiseInputTopics();
 
   // Reward publisher
-  reward_pub = nh_private_.advertise<std_msgs::Int8>("reward", 100);
+  reward_pub = nh_private_.advertise<std_msgs::Float64>("reward", 100);
+  // reward_pub2 = nh_private_.advertise<std_msgs::Float64>("reward2", 100);
 
   // Services.
   save_map_srv_ = nh_private_.advertiseService(
@@ -340,23 +349,74 @@ void PanopticMapper::publishVisualization() {
 }
 
 void PanopticMapper::publishReward() {
-  SubmapCollection* submaps = submaps_.get();
+  // SubmapCollection* submaps = submaps_.get();
   // double map_size = 0;
-  int num_submap = submaps->size();
+  // // int num_submap = submaps->size();
   // voxblox::Mesh mesh = voxblox::Mesh();
   // for (Submap& submap : *submaps) {
-  //   submap.getMeshLayer().getMesh(&mesh);
-  //   map_size += mesh.vertices.size();
+  //   // submap.getMeshLayer().getMesh(&mesh);
+  //   // submap.getTsdfLayer().getMesh(&mesh);
+  //   map_size += mesh.size();
   // }
+
   // double map_size_diff = map_size - map_size_prev;
   // map_size_prev = map_size;
-  // LOG_IF(INFO, true) << map_size_diff;
-  int num_submap_diff = num_submap - num_submap_prev;
-  num_submap_prev = num_submap;
-  std_msgs::Int8 reward_msg;
-  reward_msg.data = num_submap_diff;
+  // std_msgs::Float64 reward_msg;
+  // std_msgs::Float64 reward_msg2;
+  // reward_msg.data = map_size;
+  // reward_msg2.data = map_size_diff;
+  // reward_pub.publish(reward_msg);
+  // reward_pub2.publish(reward_msg2);
+  // LOG_IF(INFO, true) << map_size;
+  // // LOG_IF(INFO, true) << map_size_diff;
+  // // int num_submap_diff = num_submap - num_submap_prev;
+  // // num_submap_prev = num_submap;
+  // // std_msgs::Int8 reward_msg;
+  // // reward_msg.data = num_submap_diff;
+  // // reward_pub.publish(reward_msg);
+  // // LOG_IF(INFO, true) << num_submap_diff;
+
+  // ChangeState change = submap.getChangeState();
+    // if (change == ChangeState::kUnobserved) {
+    //   LOG_IF(INFO, true) << "absent";
+    // }
+
+  SubmapCollection* submaps = submaps_.get();
+  double map_size = 0;
+  double threshold = 0.5;
+  if (episode_idx >= 255) {
+    submaps_->clear();
+    episode_idx = 0;
+    map_size_prev = 0;
+  }
+
+  episode_idx += 1; 
+  for (Submap& submap : *submaps) {
+    // const double voxel_size = submap.getConfig().voxel_size;
+    voxblox::BlockIndexList block_indices;
+    submap.getTsdfLayer().getAllAllocatedBlocks(&block_indices);   
+    for (const auto& index : block_indices) {
+      auto& block = submap.getTsdfLayer().getBlockByIndex(index);
+      int num_voxels = submap.getTsdfLayer().getBlockByIndex(index).num_voxels();
+      for (int voxel_id = 0; voxel_id < num_voxels; voxel_id++){
+        const voxblox::TsdfVoxel& voxel = block.getVoxelByLinearIndex(voxel_id);   
+        if (voxel.distance <= threshold) {
+          map_size += 1;
+        }
+      }
+    }
+  }
+  
+  double map_size_diff = map_size - map_size_prev;
+  map_size_prev = map_size;
+  std_msgs::Float64 reward_msg;
+  reward_msg.data = map_size_diff;
   reward_pub.publish(reward_msg);
-  LOG_IF(INFO, true) << num_submap_diff;
+  LOG_IF(INFO, true) << map_size_diff;
+  // std_msgs::Float64 reward_msg2;
+  // reward_msg2.data = map_size;
+  // reward_pub2.publish(reward_msg2);
+  // LOG_IF(INFO, true) << map_size;
 }
 
 bool PanopticMapper::saveMap(const std::string& file_path) {

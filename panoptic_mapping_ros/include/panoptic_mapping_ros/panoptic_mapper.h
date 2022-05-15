@@ -163,6 +163,7 @@ class PanopticMapper {
   ros::Timer print_timing_timer_;
   ros::Timer input_timer_;
   ros::Publisher reward_pub;
+  ros::Publisher reward_pub2;
 
   // Members.
   const Config config_;
@@ -172,6 +173,7 @@ class PanopticMapper {
   std::shared_ptr<ThreadSafeSubmapCollection> thread_safe_submaps_;
   double map_size_prev;
   int num_submap_prev;
+  int episode_idx;
 
   // Mapping.
   std::unique_ptr<IDTrackerBase> id_tracker_;
