@@ -1,3 +1,5 @@
+This repo is the fork of [Panoptic Multi-TSDFs](https://github.com/ethz-asl/panoptic_mapping). You can follow the installations steps outlined below and then switch to Interactive Exploration for Mapping [repo](https://github.com/cmakcay/interaction-mapping) for further instructions about how to use the mapper in combination with our reinforcement learning framework.
+
 ![Ubuntu 18 + ROS Melodic](https://github.com/ethz-asl/panoptic_mapping/actions/workflows/build_test_18.yml/badge.svg) ![Ubuntu 20 + ROS Noetic](https://github.com/ethz-asl/panoptic_mapping/actions/workflows/build_test_20.yml/badge.svg)
 
 # Panoptic Mapping
