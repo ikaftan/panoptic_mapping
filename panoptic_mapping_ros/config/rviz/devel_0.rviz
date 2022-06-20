@@ -7,7 +7,7 @@ Panels:
         - /Origin1
         - /Panoptic Mapper1
       Splitter Ratio: 0.8294117450714111
-    Tree Height: 758
+    Tree Height: 408
   - Class: rviz/Selection
     Name: Selection
   - Class: rviz/Tool Properties
@@ -54,13 +54,13 @@ Visualization Manager:
       Value: false
     - Alpha: 1
       Class: rviz/Axes
-      Enabled: true
+      Enabled: false
       Length: 1
       Name: Origin
       Radius: 0.05000000074505806
       Reference Frame: <Fixed Frame>
       Show Trail: true
-      Value: true
+      Value: false
     - Class: rviz/Marker
       Enabled: false
       Marker Topic: /path_visualizer/path
@@ -79,7 +79,100 @@ Visualization Manager:
           Topic: /panoptic_mapper_0/visualization/submaps/mesh
           Unreliable: false
           Value: true
-          Visible: true
+          Visible:
+            0_Door.005: true
+            10_StoveBurner: true
+            11_StoveKnob: true
+            12_StoveBottomDoor1: true
+            13_Drawer: true
+            14_Floor: true
+            15_Drawer: true
+            16_CounterTop: true
+            17_StoveBurner: true
+            18_Drawer: true
+            19_PlateStack: true
+            1_LightSwitch: true
+            20_CounterTop: true
+            21_WineGlass: true
+            22_Shelves: true
+            23_HousePlant: true
+            24_Wall: true
+            25_Fridge: true
+            26_Drawer: true
+            27_PlateStack: true
+            28_Window: true
+            29_BaseBoard: true
+            2_Hanger: true
+            30_Cube.729: true
+            31_Bread: true
+            32_Ceiling.006: true
+            33_Kettle: true
+            34_StoveBurner: true
+            35_PlateStack: true
+            36_Vase: true
+            37_DoorFrame.005: true
+            38_Drawer: true
+            39_Drawer: true
+            3_BaseBoard: true
+            40_Pot: true
+            41_StoveTopGas: true
+            42_StoveBurner: true
+            43_StoveBase1: true
+            44_StoveTopDoor1: true
+            46_PepperShaker: true
+            47_CounterTop: true
+            48_StoveKnob: true
+            49_Sink: true
+            4_CuttingBoard: true
+            50_Window: true
+            51_Vase: true
+            52_PlateStack: true
+            53_CounterTop: true
+            54_Kettle: true
+            55_Cabinet: true
+            56_Cups: true
+            57_Plate: true
+            58_SoapBottle: true
+            59_Microwave: true
+            5_StoveKnob: true
+            60_Cup: true
+            61_Cabinet: true
+            62_Faucet: true
+            63_Knife: true
+            64_ButterKnife: true
+            65_Sink: true
+            66_Lettuce: true
+            67_Kettle: true
+            68_Mug: true
+            69_Mug: true
+            6_Bucket: true
+            70_Mug: true
+            71_Spatula: true
+            72_Mug: true
+            73_SaltShaker: true
+            74_Potato: true
+            75_Cube.730: true
+            76_Egg: true
+            77_Tomato: true
+            78_Bowl: true
+            79_Toaster: true
+            7_StoveKnob: true
+            80_DishSponge: true
+            81_Pan: true
+            82_DiningTable: true
+            83_CoffeeMachine: true
+            84_Apple: true
+            85_Spoon: true
+            86_Cup: true
+            87_Handle_Front.003: true
+            88_Mug: true
+            89_Fork: true
+            8_Cylinder.076: true
+            90_Kettle: true
+            91_Kettle: true
+            92_Kettle: true
+            9_GarbageCan: true
+            Value: true
         - Alpha: 0.30000001192092896
           Autocompute Intensity Bounds: true
           Autocompute Value Bounds:
@@ -135,7 +228,7 @@ Visualization Manager:
         - Class: rviz/Group
           Displays:
             - Class: rviz/Image
-              Enabled: true
+              Enabled: false
               Image Topic: /panoptic_mapper/visualization/tracking/color
               Max Value: 1
               Median window: 5
@@ -145,9 +238,9 @@ Visualization Manager:
               Queue Size: 2
               Transport Hint: raw
               Unreliable: false
-              Value: true
+              Value: false
             - Class: rviz/Image
-              Enabled: true
+              Enabled: false
               Image Topic: /panoptic_mapper/visualization/tracking/input
               Max Value: 1
               Median window: 5
@@ -157,9 +250,9 @@ Visualization Manager:
               Queue Size: 2
               Transport Hint: raw
               Unreliable: false
-              Value: true
+              Value: false
             - Class: rviz/Image
-              Enabled: true
+              Enabled: false
               Image Topic: /panoptic_mapper/visualization/tracking/rendered
               Max Value: 1
               Median window: 5
@@ -169,9 +262,9 @@ Visualization Manager:
               Queue Size: 2
               Transport Hint: raw
               Unreliable: false
-              Value: true
+              Value: false
             - Class: rviz/Image
-              Enabled: true
+              Enabled: false
               Image Topic: /panoptic_mapper/visualization/tracking/tracked
               Max Value: 1
               Median window: 5
@@ -181,7 +274,7 @@ Visualization Manager:
               Queue Size: 2
               Transport Hint: raw
               Unreliable: false
-              Value: true
+              Value: false
           Enabled: true
           Name: Tracking
       Enabled: true
@@ -214,7 +307,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 12.111974716186523
+      Distance: 4.355884075164795
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -222,31 +315,31 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: -0.6287777423858643
-        Y: -1.2022790908813477
-        Z: -0.9994813203811646
+        X: -2.038158655166626
+        Y: -1.2853049039840698
+        Z: 1.7391270399093628
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: -1.0197968482971191
+      Pitch: 0.005202815867960453
       Target Frame: <Fixed Frame>
-      Yaw: 4.765435218811035
+      Yaw: 4.690433025360107
     Saved: ~
 Window Geometry:
   Color:
-    collapsed: false
+    collapsed: true
   Displays:
-    collapsed: false
-  Height: 1505
-  Hide Left Dock: false
+    collapsed: true
+  Height: 1199
+  Hide Left Dock: true
   Hide Right Dock: false
   Input:
-    collapsed: false
-  QMainWindow State: 000000ff00000000fd0000000400000000000001f7000004d9fc0200000012fb0000001200530065006c0065006300740069006f006e000000003d0000009b000000b000fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000b0fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afc0000006e000003640000018200fffffffa000000010100000002fb0000000e004e006f0072006d0061006c007302000001c80000025800000280000001e0fb000000100044006900730070006c006100790073010000000000000156000001f700fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000a0049006d00610067006500000001de000000a60000000000000000fb0000000a0049006d0061006700650000000246000000d00000000000000000fb0000001e0055006e0072006500660069006e0064006500200049006e007000750074020000003b0000025800000280000001e0fb0000000a0049006d00610067006500000002f1000000ad0000000000000000fb0000000a0049006d00610067006501000002b50000006f0000000000000000fb0000000a0049006d006100670065010000032a000000740000000000000000fb0000000a0043006f006c006f007201000003de0000005c0000002600fffffffb0000000e0054007200610063006b006500640100000446000000480000002600fffffffb0000000a0049006e007000750074010000049a000000540000002600fffffffb0000001000520065006e0064006500720065006401000004fa0000004d0000002600ffffff000000010000010f00000361fc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073000000003d000003610000013200fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000745000000eefc0100000005fb0000000a0043006f006c006f007200000000000000013c0000000000000000fb0000000a0049006e00700075007400000001420000012b0000000000000000fb0000001000520065006e006400650072006500640000000273000000770000000000000000fb0000000e0054007200610063006b0065006400000002f0000004550000000000000000fb0000000a00560069006500770073030000004e00000080000002e1000001970000000300000ad400000060fc0100000002fb0000000800540069006d0065010000000000000ad40000057100fffffffb0000000800540069006d00650100000000000004500000000000000000000008d1000004d900000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+    collapsed: true
+  QMainWindow State: 000000ff00000000fd0000000400000000000001f7000004d9fc0200000012fb0000001200530065006c0065006300740069006f006e000000003d0000009b000000b000fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000b0fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afc0000006e000003640000000000fffffffa000000000100000002fb0000000e004e006f0072006d0061006c007302000001c80000025800000280000001e0fb000000100044006900730070006c006100790073000000000000000156000001f700fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000a0049006d00610067006500000001de000000a60000000000000000fb0000000a0049006d0061006700650000000246000000d00000000000000000fb0000001e0055006e0072006500660069006e0064006500200049006e007000750074020000003b0000025800000280000001e0fb0000000a0049006d00610067006500000002f1000000ad0000000000000000fb0000000a0049006d00610067006501000002b50000006f0000000000000000fb0000000a0049006d006100670065010000032a000000740000000000000000fb0000000a0043006f006c006f007200000003de0000005c0000002600fffffffb0000000e0054007200610063006b006500640000000446000000480000002600fffffffb0000000a0049006e007000750074000000049a000000540000002600fffffffb0000001000520065006e0064006500720065006400000004fa0000004d0000002600ffffff000000010000010f00000361fc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073000000003d000003610000013200fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000745000000eefc0100000005fb0000000a0043006f006c006f007200000000000000013c0000000000000000fb0000000a0049006e00700075007400000001420000012b0000000000000000fb0000001000520065006e006400650072006500640000000273000000770000000000000000fb0000000e0054007200610063006b0065006400000002f0000004550000000000000000fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000008d800000060fc0100000002fb0000000800540069006d00650100000000000008d80000057100fffffffb0000000800540069006d00650100000000000004500000000000000000000008d8000003a700000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Rendered:
-    collapsed: false
+    collapsed: true
   Selection:
     collapsed: false
   Time:
@@ -254,9 +347,9 @@ Window Geometry:
   Tool Properties:
     collapsed: false
   Tracked:
-    collapsed: false
+    collapsed: true
   Views:
     collapsed: false
-  Width: 2772
-  X: -17
-  Y: 616
+  Width: 2264
+  X: 477
+  Y: 116

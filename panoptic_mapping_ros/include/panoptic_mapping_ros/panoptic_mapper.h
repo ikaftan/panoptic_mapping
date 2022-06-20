@@ -40,6 +40,11 @@ class PanopticMapper {
     // Frame name used for the global frame (often mission, world, or odom).
     std::string global_frame_name = "mission";
 
+    int object_id;
+    double distance_threshold;
+    std::string mode;
+    int episode_length;
+
     // How frequently to perform tasks. Execution period in seconds. Use -1 for
     // every frame, 0 for never.
     float visualization_interval = -1.f;
@@ -87,6 +92,7 @@ class PanopticMapper {
   // ROS callbacks.
   // Timers.
   void publishRewardCallback(const ros::TimerEvent&);
+  void publishEvaluationCallback(const ros::TimerEvent&);
   void publishVisualizationCallback(const ros::TimerEvent&);
   void dataLoggingCallback(const ros::TimerEvent&);
   void printTimingsCallback(const ros::TimerEvent&);
@@ -128,6 +134,7 @@ class PanopticMapper {
   // Update the meshes and publish the all visualizations of the current map.
   void publishVisualization();
   void publishReward();
+  void publishEvaluation();
 
   // Access.
   const SubmapCollection& getSubmapCollection() const { return *submaps_; }
@@ -163,7 +170,8 @@ class PanopticMapper {
   ros::Timer print_timing_timer_;
   ros::Timer input_timer_;
   ros::Publisher reward_pub;
-  ros::Publisher reward_pub2;
+  ros::Publisher evaluation_pub;
+
 
   // Members.
   const Config config_;
@@ -171,9 +179,8 @@ class PanopticMapper {
   // Map.
   std::shared_ptr<SubmapCollection> submaps_;
   std::shared_ptr<ThreadSafeSubmapCollection> thread_safe_submaps_;
-  double map_size_prev;
-  int num_submap_prev;
   int episode_idx;
+  double map_size_prev;
 
   // Mapping.
   std::unique_ptr<IDTrackerBase> id_tracker_;

@@ -66,6 +66,10 @@ void PanopticMapper::Config::setupParamsAndPrinting() {
   setupParam("save_map_path_when_finished", &save_map_path_when_finished);
   setupParam("display_config_units", &display_config_units);
   setupParam("indicate_default_values", &indicate_default_values);
+  setupParam("object_id", &object_id);
+  setupParam("distance_threshold", &distance_threshold);
+  setupParam("mode", &mode);
+  setupParam("episode_length", &episode_length);
 }
 
 PanopticMapper::PanopticMapper(const ros::NodeHandle& nh,
@@ -92,9 +96,8 @@ PanopticMapper::PanopticMapper(const ros::NodeHandle& nh,
 void PanopticMapper::setupMembers() {
   // Map.
   submaps_ = std::make_shared<SubmapCollection>();
-  map_size_prev = 0;
-  num_submap_prev = 0;
   episode_idx = 0;
+  map_size_prev = 0;
 
   // Threadsafe wrapper for the map.
   thread_safe_submaps_ = std::make_shared<ThreadSafeSubmapCollection>(submaps_);
@@ -199,7 +202,8 @@ void PanopticMapper::setupRos() {
 
   // Reward publisher
   reward_pub = nh_private_.advertise<std_msgs::Float64>("reward", 100);
-  // reward_pub2 = nh_private_.advertise<std_msgs::Float64>("reward2", 100);
+  evaluation_pub = nh_private_.advertise<std_msgs::Float64>("evaluation", 100);
+
 
   // Services.
   save_map_srv_ = nh_private_.advertiseService(
@@ -303,7 +307,12 @@ void PanopticMapper::processInput(InputData* input) {
   if (config_.visualization_interval < 0.f) {
     Timer vis_timer("input/visualization");
     publishVisualizationCallback(ros::TimerEvent());
-    publishRewardCallback(ros::TimerEvent());
+    if (config_.mode == "eval") {
+      publishEvaluationCallback(ros::TimerEvent());
+    } 
+    else {
+      publishRewardCallback(ros::TimerEvent());
+    }
   }
   if (config_.data_logging_interval < 0.f) {
     dataLoggingCallback(ros::TimerEvent());
@@ -349,50 +358,11 @@ void PanopticMapper::publishVisualization() {
 }
 
 void PanopticMapper::publishReward() {
-  // SubmapCollection* submaps = submaps_.get();
-  // double map_size = 0;
-  // // int num_submap = submaps->size();
-  // voxblox::Mesh mesh = voxblox::Mesh();
-  // for (Submap& submap : *submaps) {
-  //   // submap.getMeshLayer().getMesh(&mesh);
-  //   // submap.getTsdfLayer().getMesh(&mesh);
-  //   map_size += mesh.size();
-  // }
-
-  // double map_size_diff = map_size - map_size_prev;
-  // map_size_prev = map_size;
-  // std_msgs::Float64 reward_msg;
-  // std_msgs::Float64 reward_msg2;
-  // reward_msg.data = map_size;
-  // reward_msg2.data = map_size_diff;
-  // reward_pub.publish(reward_msg);
-  // reward_pub2.publish(reward_msg2);
-  // LOG_IF(INFO, true) << map_size;
-  // // LOG_IF(INFO, true) << map_size_diff;
-  // // int num_submap_diff = num_submap - num_submap_prev;
-  // // num_submap_prev = num_submap;
-  // // std_msgs::Int8 reward_msg;
-  // // reward_msg.data = num_submap_diff;
-  // // reward_pub.publish(reward_msg);
-  // // LOG_IF(INFO, true) << num_submap_diff;
-
-  // ChangeState change = submap.getChangeState();
-    // if (change == ChangeState::kUnobserved) {
-    //   LOG_IF(INFO, true) << "absent";
-    // }
-
   SubmapCollection* submaps = submaps_.get();
-  double map_size = 0;
-  double threshold = 0.5;
-  if (episode_idx >= 255) {
-    submaps_->clear();
-    episode_idx = 0;
-    map_size_prev = 0;
-  }
-
   episode_idx += 1; 
+  double map_size = 0;
+
   for (Submap& submap : *submaps) {
-    // const double voxel_size = submap.getConfig().voxel_size;
     voxblox::BlockIndexList block_indices;
     submap.getTsdfLayer().getAllAllocatedBlocks(&block_indices);   
     for (const auto& index : block_indices) {
@@ -400,7 +370,7 @@ void PanopticMapper::publishReward() {
       int num_voxels = submap.getTsdfLayer().getBlockByIndex(index).num_voxels();
       for (int voxel_id = 0; voxel_id < num_voxels; voxel_id++){
         const voxblox::TsdfVoxel& voxel = block.getVoxelByLinearIndex(voxel_id);   
-        if (voxel.distance <= threshold) {
+        if (voxel.distance <= config_.distance_threshold) {
           map_size += 1;
         }
       }
@@ -413,10 +383,59 @@ void PanopticMapper::publishReward() {
   reward_msg.data = map_size_diff;
   reward_pub.publish(reward_msg);
   LOG_IF(INFO, true) << map_size_diff;
-  // std_msgs::Float64 reward_msg2;
-  // reward_msg2.data = map_size;
-  // reward_pub2.publish(reward_msg2);
-  // LOG_IF(INFO, true) << map_size;
+
+  if (episode_idx == config_.episode_length) {
+    submaps_->clear();
+    episode_idx = 0;
+    map_size_prev = 0;
+  }
+}
+
+void PanopticMapper::publishEvaluation(){
+  SubmapCollection* submaps = submaps_.get();
+  double evaluation_submap_size = 0;
+  episode_idx += 1;
+  // double eval_map = 0;
+
+  for (Submap& submap : *submaps) {
+      if (submap.getInstanceID() == config_.object_id) {
+        voxblox::BlockIndexList block_indices;
+        submap.getTsdfLayer().getAllAllocatedBlocks(&block_indices);   
+        for (const auto& index : block_indices) {
+          auto& block = submap.getTsdfLayer().getBlockByIndex(index);
+          int num_voxels = submap.getTsdfLayer().getBlockByIndex(index).num_voxels();
+          for (int voxel_id = 0; voxel_id < num_voxels; voxel_id++){
+            const voxblox::TsdfVoxel& voxel = block.getVoxelByLinearIndex(voxel_id);   
+            if (voxel.distance <= config_.distance_threshold) {
+              evaluation_submap_size += 1;
+            }
+          }
+        }
+      }
+    // voxblox::BlockIndexList block_indices;
+    // submap.getTsdfLayer().getAllAllocatedBlocks(&block_indices);   
+    // for (const auto& index : block_indices) {
+    //   auto& block = submap.getTsdfLayer().getBlockByIndex(index);
+    //   int num_voxels = submap.getTsdfLayer().getBlockByIndex(index).num_voxels();
+    //   for (int voxel_id = 0; voxel_id < num_voxels; voxel_id++){
+    //     const voxblox::TsdfVoxel& voxel = block.getVoxelByLinearIndex(voxel_id);   
+    //     if (voxel.distance <= config_.distance_threshold) {
+    //       eval_map += 1;
+    //     }
+    //   }
+    // }
+  }
+
+  if (episode_idx == config_.episode_length) {
+    submaps_->clear();
+    episode_idx = 0;
+  }
+
+  std_msgs::Float64 evaluation_msg;
+  evaluation_msg.data = evaluation_submap_size;
+  // evaluation_msg.data = eval_map;
+  evaluation_pub.publish(evaluation_msg);
+  LOG_IF(INFO, true) << evaluation_msg;
 }
 
 bool PanopticMapper::saveMap(const std::string& file_path) {
@@ -470,6 +489,10 @@ void PanopticMapper::publishVisualizationCallback(const ros::TimerEvent&) {
 
 void PanopticMapper::publishRewardCallback(const ros::TimerEvent&) {
   publishReward();
+}
+
+void PanopticMapper::publishEvaluationCallback(const ros::TimerEvent&) {
+  publishEvaluation();
 }
 
 bool PanopticMapper::setVisualizationModeCallback(
